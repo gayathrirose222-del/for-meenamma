@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Meenamma</title>
+    <style>
+        :root {
+            --primary-red: #ff4d4d;
+            --bg-light: #fff0f0;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            font-family: 'Georgia', serif;
+            overflow: hidden;
+            height: 100%;
+            background-color: white;
+        }
+
+        .page {
+            display: none;
+            height: 100vh;
+            width: 100vw;
+            position: absolute;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .active { display: flex; }
+        .red-bg { background-color: var(--bg-light); }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(255, 77, 77, 0.1);
+            width: 85%;
+            max-width: 380px;
+        }
+
+        input {
+            width: 85%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ffcccc;
+            border-radius: 10px;
+        }
+
+        button {
+            background: var(--primary-red);
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .flashcard-img {
+            width: 280px;
+            height: 400px;
+            object-fit: cover;
+            border: 8px solid white;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+        }
+
+        #noBtn {
+            position: absolute;
+            background: #777;
+            padding: 8px 18px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="page1" class="page active">
+        <h1 style="color: var(--primary-red);">Happy Valentine's Day</h1>
+        <button onclick="nextPage(2)">START</button>
+    </div>
+
+    <div id="page2" class="page red-bg">
+        <div class="glass-card">
+            <h2 style="color: var(--primary-red);">Login</h2>
+            <input type="text" id="u" placeholder="Username">
+            <input type="password" id="p" placeholder="Password">
+            <button onclick="checkLogin()">Login</button>
+        </div>
+    </div>
+
+    <div id="page3" class="page">
+        <img id="fImg" class="flashcard-img" src="pic1.jpeg">
+        <h3 id="fMsg" style="color: #444;">You are my world.</h3>
+        <button onclick="cycle()">Next Memory</button>
+    </div>
+
+    <div id="page4" class="page red-bg">
+        <div class="glass-card">
+            <h2 style="color: var(--primary-red);">Do you know me?</h2>
+            <p id="qT" style="font-weight: bold;"></p>
+            <input type="text" id="qA" placeholder="Answer...">
+            <button onclick="verifyAns()">Submit</button>
+        </div>
+    </div>
+
+    <div id="page5" class="page">
+        <h1 style="color: var(--primary-red);">Will you marry me?</h1>
+        <div style="position: relative; height: 200px; width: 100%;">
+            <button onclick="nextPage(6)">YES</button>
+            <button id="noBtn" onmouseover="move()">No</button>
+        </div>
+    </div>
+
+    <div id="page6" class="page red-bg">
+        <h1>"You are already my wife"</h1>
+        <div style="font-size: 40px;">🌹🌹🌹🌹🌹</div>
+    </div>
+
+    <script>
+        const USER = "meenamma";
+        const PASS = "i love you";
+
+        const memories = [
+            { s: "pic1.jpeg", m: "I love your smile in this one!" },
+            { s: "pic2.jpeg", m: "Our chemistry is just perfect." },
+            { s: "pic 3.jpeg", m: "This is one of my favorite memories." }, // Corrected space
+            { s: "pic4.jpeg", m: "I could look at you forever." },
+            { s: "pic5.jpeg", m: "You look absolutely stunning here." },
+            { s: "pic6.jpeg", m: "You make me the happiest person." }
+        ];
+
+        const questions = [
+            { q: "My favourite Car?", a: "BMW" },
+            { q: "The person i love most?", a: "Panda" },
+            { q: "Honey moon place?", a: "Paris" },
+            { q: "First place i gave you kiss?", a: "Wonderla" },
+            { q: "Most intense moment?", a: "KG" }
+        ];
+
+        let mIdx = 0, qIdx = 0, score = 0;
+
+        function nextPage(n) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page'+n).classList.add('active');
+            if(n===4) showQ();
+        }
+
+        function checkLogin() {
+            if(document.getElementById('u').value.toLowerCase() === USER && 
+               document.getElementById('p').value === PASS) nextPage(3);
+            else alert("Try again, my love!");
+        }
+
+        function cycle() {
+            mIdx++;
+            if(mIdx < memories.length) {
+                document.getElementById('fImg').src = memories[mIdx].s;
+                document.getElementById('fMsg').innerText = memories[mIdx].m;
+            } else nextPage(4);
+        }
+
+        function showQ() {
+            if(qIdx < questions.length) {
+                document.getElementById('qT').innerText = questions[qIdx].q;
+                document.getElementById('qA').value = "";
+            } else {
+                if(score >= 3) nextPage(5);
+                else { alert("Try again!"); qIdx=0; score=0; showQ(); }
+            }
+        }
+
+        function verifyAns() {
+            if(document.getElementById('qA').value.trim().toLowerCase() === questions[qIdx].a.toLowerCase()) score++;
+            qIdx++; showQ();
+        }
+
+        function move() {
+            const b = document.getElementById('noBtn');
+            b.style.left = Math.random() * (window.innerWidth - 100) + 'px';
+            b.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+        }
+    </script>
+</body>
+</html>
